@@ -179,6 +179,20 @@
       });
     }
 
+    window.addEventListener('message', ({ data }) => {
+      const { eventType, eventData } = JSON.parse(data);
+      console.log(eventType, eventData);
+    });
+
+    Telegram.WebApp.onEvent('invoice_closed', (data) => {
+      instance.SendMessage(
+          'Shop',
+          'CallBackPayment',
+          status
+        );
+    });
+
+
       var container = document.querySelector('#unity-container');
       var canvas = document.querySelector('#unity-canvas');
       var loadingCover = document.querySelector('#loading-cover');
