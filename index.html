@@ -179,18 +179,6 @@
       });
     }
 
-    window.addEventListener('message', ({ data }) => {
-      const { eventType, eventData } = JSON.parse(data);
-      console.log(eventType, eventData);
-      if(eventType == "invoice_closed"){
-        instance.SendMessage(
-          'Shop',
-          'CallBackPayment',
-          "status"
-        );
-      }
-    });
-
 
       var container = document.querySelector('#unity-container');
       var canvas = document.querySelector('#unity-canvas');
@@ -281,6 +269,18 @@
                 'ReceiveJsonDataFromWeb',
                 requestDataJson
               );
+
+              window.addEventListener('message', ({ data }) => {
+                const { eventType, eventData } = JSON.parse(data);
+                console.log(eventType, eventData);
+                if(eventType == "invoice_closed"){
+                  unityInstance.SendMessage(
+                    'Shop',
+                    'CallBackPayment',
+                    "status"
+                  );
+                }
+              });
               
             } else {
               console.error('[Web] Unity instance is not ready.');
