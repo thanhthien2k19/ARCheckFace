@@ -1,0 +1,41 @@
+stages:
+  - deploy
+
+deploy-develop:
+  stage: deploy
+  script:
+    - aws s3 sync --exclude '*' --include "*.svg" --no-guess-mime-type --content-type "image/svg+xml" --cache-control 'max-age=604800' . $CI_DEV_S3_BUCKET --delete
+    - aws s3 sync --cache-control 'max-age=604800' --exclude "*.svg" --exclude index.html --exclude .git/ --exclude .gitlab-ci.yml . $CI_DEV_S3_BUCKET --delete
+    - aws s3 sync --cache-control 'no-cache' . $CI_DEV_S3_BUCKET
+    - aws configure set preview.cloudfront true
+    - aws cloudfront create-invalidation --distribution-id $CI_DEV_CLOUDFRONT_ID --paths '/*'
+
+  only:
+    - develop
+  tags:
+    - DEV
+
+deploy-staging:
+  stage: deploy
+  script:
+    - aws s3 sync --exclude '*' --include "*.svg" --no-guess-mime-type --content-type "image/svg+xml" --cache-control 'max-age=604800' . $CI_STG_S3_BUCKET --delete
+    - aws s3 sync --cache-control 'max-age=604800' --exclude "*.svg" --exclude index.html --exclude .git/ --exclude .gitlab-ci.yml . $CI_STG_S3_BUCKET --delete
+    - aws s3 sync --cache-control 'no-cache' . $CI_STG_S3_BUCKET
+    - aws configure set preview.cloudfront true
+    - aws cloudfront create-invalidation --distribution-id $CI_STG_CLOUDFRONT_ID --paths '/*'
+  only:
+    - staging
+  tags:
+    - STG
+deploy-production:
+  stage: deploy
+  script:
+    - aws s3 sync --exclude '*' --include "*.svg" --no-guess-mime-type --content-type "image/svg+xml" --cache-control 'max-age=604800' . $CI_PROD_S3_BUCKET --delete
+    - aws s3 sync --cache-control 'max-age=604800' --exclude "*.svg" --exclude index.html  --exclude .git/ --exclude .gitlab-ci.yml . $CI_PROD_S3_BUCKET --delete
+    - aws s3 sync --cache-control 'no-cache' . $CI_PROD_S3_BUCKET
+    - aws configure set preview.cloudfront true
+    - aws cloudfront create-invalidation --distribution-id $CI_PROD_CLOUDFRONT_ID --paths '/*'
+  only:
+    - master
+  tags:
+    - PROD
