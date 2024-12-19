@@ -182,14 +182,13 @@
     window.addEventListener('message', ({ data }) => {
       const { eventType, eventData } = JSON.parse(data);
       console.log(eventType, eventData);
-    });
-
-    Telegram.WebApp.onEvent('invoice_closed', (data) => {
-      instance.SendMessage(
+      if(eventType == "invoice_closed"){
+        instance.SendMessage(
           'Shop',
           'CallBackPayment',
           status
         );
+      }
     });
 
 
