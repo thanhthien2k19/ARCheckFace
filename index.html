@@ -165,22 +165,20 @@
             fallbackCopyToClipboard(link);
         }
     }
+    let instance = null;
 
     function payment(url){
       console.log("openInvoice");
       Telegram.WebApp.openInvoice(url, (status) => {
         console("payment "+status);
-        unityInstance.SendMessage(
+        instance.SendMessage(
           'Shop',
           'CallBackPayment',
           status
         );
       });
     }
-    
-    </script>
 
-    <script>
       var container = document.querySelector('#unity-container');
       var canvas = document.querySelector('#unity-canvas');
       var loadingCover = document.querySelector('#loading-cover');
@@ -204,7 +202,7 @@
 
       // This function sends JSON login data to Unity WebGL AppManager
       var script = document.createElement('script');
-      let instance = null;
+      
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
