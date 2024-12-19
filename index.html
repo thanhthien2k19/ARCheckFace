@@ -165,9 +165,33 @@
             fallbackCopyToClipboard(link);
         }
     }
-    </script>
+    let instance = null;
 
-    <script>
+    function payment(url){
+      console.log("openInvoice");
+      Telegram.WebApp.openInvoice(url, (status) => {
+        console("payment "+status);
+        instance.SendMessage(
+          'Shop',
+          'CallBackPayment',
+          status
+        );
+      });
+    }
+
+    window.addEventListener('message', ({ data }) => {
+      const { eventType, eventData } = JSON.parse(data);
+      console.log(eventType, eventData);
+      if(eventType == "invoice_closed"){
+        instance.SendMessage(
+          'Shop',
+          'CallBackPayment',
+          status
+        );
+      }
+    });
+
+
       var container = document.querySelector('#unity-container');
       var canvas = document.querySelector('#unity-canvas');
       var loadingCover = document.querySelector('#loading-cover');
@@ -191,6 +215,7 @@
 
       // This function sends JSON login data to Unity WebGL AppManager
       var script = document.createElement('script');
+      
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
@@ -202,6 +227,7 @@
           loadingText.textContent = percent + '%'; // Hiển thị phần trăm
         })
           .then((unityInstance) => {
+            instance = unityInstance;
             loadingCover.style.display = 'none';
             // fullscreenButton.onclick = () => {
             //     document.makeFullscreen('unity-container');
@@ -255,16 +281,6 @@
                 'ReceiveJsonDataFromWeb',
                 requestDataJson
               );
-              function payment(url){
-                Telegram.WebApp.openInvoice(url, (status) => {
-                  console("payment "+status);
-                  unityInstance.SendMessage(
-                    'Shop',
-                    'CallBackPayment',
-                    status
-                  );
-                });
-              }
               
             } else {
               console.error('[Web] Unity instance is not ready.');
