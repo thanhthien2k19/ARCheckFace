@@ -256,6 +256,7 @@
                 requestDataJson
               );
               function payment(url){
+                console.log("openInvoice");
                 Telegram.WebApp.openInvoice(url, (status) => {
                   console("payment "+status);
                   unityInstance.SendMessage(
