@@ -203,7 +203,7 @@
           loadingText.textContent = percent + '%'; // Hiển thị phần trăm
         })
           .then((unityInstance) => {
-            window.instance = unityInstance;
+            instance = unityInstance;
             loadingCover.style.display = 'none';
             // fullscreenButton.onclick = () => {
             //     document.makeFullscreen('unity-container');
