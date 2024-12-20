@@ -286,7 +286,7 @@
         console.log(eventType, eventData);
         if(eventType == "invoice_closed"){
           if (instance) {
-            instance.SendMessage("AppManager", "CallBackPaymentFromWeb", "testStatus");
+            instance.SendMessage("AppManager", "CallBackPaymentFromWeb", "");
           } else {
               console.error("Unity instance is not ready.");
           }
