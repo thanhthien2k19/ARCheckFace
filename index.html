@@ -273,6 +273,11 @@
         console.log("openInvoice");
         Telegram.WebApp.openInvoice(url, (status) => {
           console("payment "+status);
+          if (instance) {
+            instance.SendMessage("AppManager", "CallBackPaymentFromWeb", status);
+          } else {
+              console.error("Unity instance is not ready.");
+          }
         });
       }
 
