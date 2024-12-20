@@ -165,31 +165,6 @@
             fallbackCopyToClipboard(link);
         }
     }
-    let instance = null;
-
-    function payment(url){
-      console.log("openInvoice");
-      Telegram.WebApp.openInvoice(url, (status) => {
-        console("payment "+status);
-        instance.SendMessage(
-          'AppManager',
-          'CallBackPaymentFromWeb',
-          status
-        );
-      });
-    }
-
-    window.addEventListener('message', ({ data }) => {
-      const { eventType, eventData } = JSON.parse(data);
-      console.log(eventType, eventData);
-      if(eventType == "invoice_closed"){
-        instance.SendMessage(
-          'AppManager',
-          'CallBackPaymentFromWeb',
-          ""
-        );
-      }
-    });
 
 
       var container = document.querySelector('#unity-container');
@@ -216,6 +191,7 @@
       // This function sends JSON login data to Unity WebGL AppManager
       var script = document.createElement('script');
       
+      let instance = null;
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
@@ -290,6 +266,30 @@
             alert(message);
           });
       };
+
+      function payment(url){
+        console.log("openInvoice");
+        Telegram.WebApp.openInvoice(url, (status) => {
+          console("payment "+status);
+          instance.SendMessage(
+            'AppManager',
+            'CallBackPaymentFromWeb',
+            status
+          );
+        });
+      }
+
+      window.addEventListener('message', ({ data }) => {
+        const { eventType, eventData } = JSON.parse(data);
+        console.log(eventType, eventData);
+        if(eventType == "invoice_closed"){
+          instance.SendMessage(
+            'AppManager',
+            'CallBackPaymentFromWeb',
+            ""
+          );
+        }
+      });
 
       document.body.appendChild(script);
     </script>
