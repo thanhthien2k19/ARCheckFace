@@ -191,10 +191,9 @@
       // This function sends JSON login data to Unity WebGL AppManager
       var script = document.createElement('script');
       
-      let instance = null;
       script.src = loaderUrl;
       script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
+        var instan = createUnityInstance(canvas, config, (progress) => {
           // progressBarFull.style.width = 100 * progress + '%';
           // loadingText.textContent = Math.round(100 * progress) + '%';
 
@@ -203,7 +202,7 @@
           loadingText.textContent = percent + '%'; // Hiển thị phần trăm
         })
           .then((unityInstance) => {
-            instance = unityInstance;
+            window.unityInstance = unityInstance; = unityInstance;
             loadingCover.style.display = 'none';
             // fullscreenButton.onclick = () => {
             //     document.makeFullscreen('unity-container');
@@ -271,7 +270,7 @@
         console.log("openInvoice");
         Telegram.WebApp.openInvoice(url, (status) => {
           console("payment "+status);
-          instance.SendMessage(
+          unityInstance.SendMessage(
             'AppManager',
             'CallBackPaymentFromWeb',
             status
@@ -283,11 +282,11 @@
         const { eventType, eventData } = JSON.parse(data);
         console.log(eventType, eventData);
         if(eventType == "invoice_closed"){
-          instance.SendMessage(
-            'AppManager',
-            'CallBackPaymentFromWeb',
-            ""
-          );
+          if (unityInstance) {
+            unityInstance.SendMessage("AppManager", "CallBackPaymentFromWeb", "testStatus");
+          } else {
+              console.error("Unity instance is not ready.");
+          }
         }
       });
 
