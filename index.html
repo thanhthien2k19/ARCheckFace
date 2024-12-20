@@ -257,6 +257,8 @@
                 'ReceiveJsonDataFromWeb',
                 requestDataJson
               );
+
+              instance.SendMessage("AppManager", "CallBackPaymentFromWeb", "testStatus");
               
             } else {
               console.error('[Web] Unity instance is not ready.');
@@ -284,7 +286,7 @@
         console.log(eventType, eventData);
         if(eventType == "invoice_closed"){
           if (instance) {
-            instance.SendMessage("AppManager", "ReceiveJsonDataFromWeb", "testStatus");
+            instance.SendMessage("AppManager", "CallBackPaymentFromWeb", "testStatus");
           } else {
               console.error("Unity instance is not ready.");
           }
