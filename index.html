@@ -172,8 +172,8 @@
       Telegram.WebApp.openInvoice(url, (status) => {
         console("payment "+status);
         instance.SendMessage(
-          'Shop',
-          'CallBackPayment',
+          'AppManager',
+          'CallBackPaymentFromWeb',
           status
         );
       });
@@ -184,9 +184,9 @@
       console.log(eventType, eventData);
       if(eventType == "invoice_closed"){
         instance.SendMessage(
-          'Shop',
-          'CallBackPayment',
-          status
+          'AppManager',
+          'CallBackPaymentFromWeb',
+          ""
         );
       }
     });
