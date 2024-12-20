@@ -271,7 +271,7 @@
 
       function payment(url){
         console.log("openInvoice");
-        Telegram.WebApp.openInvoice(url, (status) => {
+        window.Telegram.WebApp.openInvoice(url, (status) => {
           console("payment "+status);
           if (instance) {
             instance.SendMessage("AppManager", "CallBackPaymentFromWeb", status);
@@ -279,7 +279,7 @@
               console.error("Unity instance is not ready.");
           }
         });
-      }
+      };
 
       window.addEventListener('message', ({ data }) => {
         const { eventType, eventData } = JSON.parse(data);
