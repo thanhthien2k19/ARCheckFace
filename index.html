@@ -276,8 +276,8 @@
       function payment(url){
         console.log("openInvoice");
         window.Telegram.WebApp.openInvoice(url, (status) => {
-          logToSpan("payment "+status);
           if (instance) {
+            logToSpan("payment 111"+status);
             instance.SendMessage("AppManager", "CallBackPaymentFromWeb", status);
           } else {
               console.error("Unity instance is not ready.");
