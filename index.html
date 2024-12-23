@@ -97,6 +97,10 @@
   </head>
   <body>
     <div id="unity-container">
+      <div id="log-container">
+        <span id="log"></span>
+      </div>
+      
       <canvas id="unity-canvas"></canvas>
     </div>
     <div id="loading-cover">
@@ -272,8 +276,8 @@
       function payment(url){
         console.log("openInvoice");
         window.Telegram.WebApp.openInvoice(url, (status) => {
-          console("payment "+status);
           if (instance) {
+            logToSpan("payment 111"+status);
             instance.SendMessage("AppManager", "CallBackPaymentFromWeb", status);
           } else {
               console.error("Unity instance is not ready.");
@@ -281,17 +285,37 @@
         });
       };
 
+      function handleInvoiceClosed(eventData) {
+        if (instance) {
+          instance.SendMessage("AppManager", "CallBackPaymentFromWeb", eventData.status);
+          logToSpan(`Payment callback sent: ${eventData.status}`);
+        } else {
+          logToSpan("Unity instance is not ready.");
+        }
+      }
+
       window.addEventListener('message', ({ data }) => {
-        const { eventType, eventData } = JSON.parse(data);
-        console.log(eventType, eventData);
-        if(eventType == "invoice_closed"){
-          if (instance) {
-            instance.SendMessage("AppManager", "CallBackPaymentFromWeb", eventData.status);
-          } else {
-              console.error("Unity instance is not ready.");
+        try {
+          const { eventType, eventData } = JSON.parse(data);
+          logToSpan(`Received from window: ${eventType}, ${JSON.stringify(eventData)}`);
+
+          if (eventType === "invoice_closed") {
+            handleInvoiceClosed(eventData);
           }
+        } catch (error) {
+          logToSpan(`Invalid data from window: ${data}`);
         }
       });
+
+
+      function logToSpan(message) {
+        const logElement = document.getElementById("log");
+        if (logElement) {
+          logElement.textContent = message; // Cập nhật nội dung
+        } else {
+          console.error("Log element not found");
+        }
+      }
 
       document.body.appendChild(script);
     </script>
