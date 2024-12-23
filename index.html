@@ -294,19 +294,6 @@
         }
       }
 
-      window.Telegram.WebApp.addEventListener('message', ({ data }) => {
-        try {
-          const { eventType, eventData } = JSON.parse(data);
-          logToSpan(`Received from Telegram: ${eventType}, ${JSON.stringify(eventData)}`);
-
-          if (eventType === "invoice_closed") {
-            handleInvoiceClosed(eventData);
-          }
-        } catch (error) {
-          logToSpan(`Invalid data from Telegram WebApp: ${data}`);
-        }
-      });
-
       window.addEventListener('message', ({ data }) => {
         try {
           const { eventType, eventData } = JSON.parse(data);
