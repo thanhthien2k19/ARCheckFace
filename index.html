@@ -166,17 +166,6 @@
           }
       }
 
-      async function getIP() {
-        try {
-            const response = await fetch('https://api.ipify.org/?format=json');
-            const data = await response.json();
-            return response.ip; // Trả về địa chỉ IP nếu thành công
-        } catch (error) {
-            console.error('Error fetching IP:', error);
-            return 'Unknown'; // Trả về "Unknown" nếu có lỗi
-        }
-      }
-
 
       var container = document.querySelector('#unity-container');
       var canvas = document.querySelector('#unity-canvas');
@@ -219,9 +208,57 @@
             // fullscreenButton.onclick = () => {
             //     document.makeFullscreen('unity-container');
             // };
+            console.log(Telegram.WebApp.initDataUnsafe);
+
+            const startParam = Telegram.WebApp.initDataUnsafe.start_param || '';
+            console.log(startParam);
+            
+            let referralCode = null;
+
+            if (startParam) {
+              if (startParam.startsWith('SHARE_')) {
+                referralCode = startParam.replace('SHARE_', ''); // Loại bỏ "SHARE_"
+                console.log('Referral Code:', referralCode);
+              } else {
+                const decodedData = atob(startParam);
+
+                const parsedData = JSON.parse(decodedData);
+
+                console.log(parsedData);
+
+                unityInstance.SendMessage(
+                  'AppManager',
+                  'LinkAccount',
+                  parsedData.accountEmail
+                );
+              }
+            }
+
+            
+            var { retrieveLaunchParams, postEvent } = window.telegramApps.sdk;
+            var lp = retrieveLaunchParams();
+            console.log(lp);
+
+            const requestDataJson = JSON.stringify({
+              init_data: lp.initDataRaw || 'Unknown',
+              ip: 'Unknown',
+              platform: lp.platform || 'Unknown',
+              referral_code: referralCode || 'Unknown',
+              user_agent: navigator.userAgent || 'Unknown',
+            });
 
             // Check if the Unity instance is ready before sending the message
             if (typeof unityInstance !== 'undefined' && unityInstance.Module) {
+              console.log(
+                '[Web] Sending login data to Unity:',
+                requestDataJson
+              );
+              // Call the method in Unity's AppManager
+              unityInstance.SendMessage(
+                'AppManager',
+                'ReceiveJsonDataFromWeb',
+                requestDataJson
+              );
 
               instance.SendMessage("AppManager", "CallBackPaymentFromWeb", "testStatus");
               
@@ -233,32 +270,6 @@
             alert(message);
           });
       };
-
-      let referralCode = null;
-      
-      console.log(Telegram.WebApp.initDataUnsafe);
-
-      const startParam = Telegram.WebApp.initDataUnsafe.start_param || '';
-      console.log(startParam);
-
-      if (startParam) {
-        if (startParam.startsWith('SHARE_')) {
-          referralCode = startParam.replace('SHARE_', ''); // Loại bỏ "SHARE_"
-          console.log('Referral Code:', referralCode);
-        } else {
-          const decodedData = atob(startParam);
-
-          const parsedData = JSON.parse(decodedData);
-
-          console.log(parsedData);
-
-          instance.SendMessage(
-            'AppManager',
-            'LinkAccount',
-            parsedData.accountEmail
-          );
-        }
-      }
 
       function payment(url){
         console.log("openInvoice");
@@ -279,28 +290,6 @@
           console.log("Unity instance is not ready.");
         }
       }
-
-      async function sendLoginData() {
-        var { retrieveLaunchParams, postEvent } = window.telegramApps.sdk;
-        var lp = retrieveLaunchParams();
-        console.log(lp);
-
-        const requestDataJson = JSON.stringify({
-            init_data: lp.initDataRaw || 'Unknown',
-            ip: await getIP(),
-            platform: lp.platform || 'Unknown',
-            referral_code: referralCode || 'Unknown',
-            user_agent: navigator.userAgent || 'Unknown',
-        });
-
-        if (typeof unityInstance !== 'undefined' && unityInstance.Module) {
-            console.log('[Web] Sending login data to Unity:', requestDataJson);
-            instance.SendMessage('YourUnityObjectName', 'YourUnityFunctionName', requestDataJson);
-        }
-      }
-
-      sendLoginData();
-
 
       window.addEventListener('message', ({ data }) => {
         try {
