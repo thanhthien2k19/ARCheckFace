@@ -150,21 +150,27 @@
             console.error('Lỗi khi sao chép:', err);
         }
         document.body.removeChild(textarea);
-    }
+      }
 
-    function copyToClipboard(link) {
-        if (navigator.clipboard) {
-            navigator.clipboard
-                .writeText(link)
-                .then(() => console.log('Đã sao chép thành công!'))
-                .catch((err) => {
-                    console.error('Lỗi khi sao chép:', err);
-                    fallbackCopyToClipboard(link); // Dùng cách fallback
-                });
-        } else {
-            fallbackCopyToClipboard(link);
-        }
-    }
+      function copyToClipboard(link) {
+          if (navigator.clipboard) {
+              navigator.clipboard
+                  .writeText(link)
+                  .then(() => console.log('Đã sao chép thành công!'))
+                  .catch((err) => {
+                      console.error('Lỗi khi sao chép:', err);
+                      fallbackCopyToClipboard(link); // Dùng cách fallback
+                  });
+          } else {
+              fallbackCopyToClipboard(link);
+          }
+      }
+
+      async function getIP(){
+        const response = await fetch('https://api.ipify.org/?format=json');
+        const data = await response.json();
+        return response.status === 200 ? data : "err"
+      }
 
 
       var container = document.querySelector('#unity-container');
@@ -237,12 +243,14 @@
             
             var { retrieveLaunchParams, postEvent } = window.telegramApps.sdk;
             var lp = retrieveLaunchParams();
-            console.log("retrieveLaunchParams");
             console.log(lp);
 
             const requestDataJson = JSON.stringify({
               init_data: lp.initDataRaw || 'Unknown',
-              referral_code: referralCode,
+              ip: getIP() || 'Unknown',
+              platform: lp.platform || 'Unknown',
+              referral_code: referral_code || 'Unknown',
+              user_agent: navigator.userAgent || 'Unknown',
             });
 
             // Check if the Unity instance is ready before sending the message
@@ -273,7 +281,6 @@
         console.log("openInvoice");
         window.Telegram.WebApp.openInvoice(url, (status) => {
           if (instance) {
-            console.log("payment 111"+status);
             instance.SendMessage("AppManager", "CallBackPaymentFromWeb", status);
           } else {
               console.error("Unity instance is not ready.");
