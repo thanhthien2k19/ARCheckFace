@@ -223,11 +223,6 @@
 
                 const previousParam = sessionStorage.getItem('lastStartParam');
 
-                if (startParam === previousParam) {
-                  console.log('Duplicate startParam detected. Skipping further actions.');
-                  return;
-                }
-
                 sessionStorage.setItem('lastStartParam', startParam);
 
                 const decodedData = atob(startParam);
@@ -235,12 +230,15 @@
                 const parsedData = JSON.parse(decodedData);
 
                 console.log(parsedData);
-
-                unityInstance.SendMessage(
+                if (startParam === previousParam) {
+                  console.log('Duplicate startParam detected. Skipping further actions.');
+                }else{
+                  unityInstance.SendMessage(
                   'AppManager',
                   'LinkAccount',
                   parsedData.accountEmail
                 );
+                }
               }
             }
 
