@@ -208,6 +208,43 @@
             // fullscreenButton.onclick = () => {
             //     document.makeFullscreen('unity-container');
             // };
+            console.log(Telegram.WebApp.initDataUnsafe);
+
+            const startParam = Telegram.WebApp.initDataUnsafe.start_param || '';
+            console.log(startParam);
+            
+            let referralCode = null;
+
+            if (startParam) {
+              if (startParam.startsWith('SHARE_')) {
+                referralCode = startParam.replace('SHARE_', '');
+                console.log('Referral Code:', referralCode);
+              } else {
+
+                const previousParam = sessionStorage.getItem('lastStartParam');
+
+                if (startParam === previousParam) {
+                  console.log('Duplicate startParam detected. Skipping further actions.');
+                  return;
+                }
+
+                sessionStorage.setItem('lastStartParam', startParam);
+
+                const decodedData = atob(startParam);
+
+                const parsedData = JSON.parse(decodedData);
+
+                console.log(parsedData);
+
+                unityInstance.SendMessage(
+                  'AppManager',
+                  'LinkAccount',
+                  parsedData.accountEmail
+                );
+              }
+            }
+
+
             
             var { retrieveLaunchParams, postEvent } = window.telegramApps.sdk;
             var lp = retrieveLaunchParams();
@@ -233,43 +270,6 @@
                 'ReceiveJsonDataFromWeb',
                 requestDataJson
               );
-
-              
-              console.log(Telegram.WebApp.initDataUnsafe);
-
-              const startParam = Telegram.WebApp.initDataUnsafe.start_param || '';
-              console.log(startParam);
-
-              let referralCode = null;
-
-              if (startParam) {
-                const previousParam = sessionStorage.getItem('lastStartParam');
-
-                if (startParam === previousParam) {
-                  console.log('Duplicate startParam detected. Skipping further actions.');
-                  return;
-                }
-
-                sessionStorage.setItem('lastStartParam', startParam);
-
-                if (startParam.startsWith('SHARE_')) {
-                  referralCode = startParam.replace('SHARE_', '');
-                  console.log('Referral Code:', referralCode);
-                } else {
-                  const decodedData = atob(startParam);
-
-                  const parsedData = JSON.parse(decodedData);
-
-                  console.log(parsedData);
-
-                  unityInstance.SendMessage(
-                    'AppManager',
-                    'LinkAccount',
-                    parsedData.accountEmail
-                  );
-                }
-              }
-
 
               instance.SendMessage("AppManager", "CallBackPaymentFromWeb", "testStatus");
               
